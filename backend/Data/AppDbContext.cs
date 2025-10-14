@@ -9,46 +9,51 @@ namespace ShopVerse.Data
         {
         }
 
-        // DbSets for all tables
+        // ---------------------- DbSets ----------------------
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
 
-        // Optional: Fluent configuration for relationships
+        // ---------------------- Relationships & Seeding ----------------------
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // Role → Users (1-to-Many)
+            // -------- Role → Users (1-to-Many) --------
             modelBuilder.Entity<Role>()
                 .HasMany(r => r.Users)
                 .WithOne(u => u.Role)
-                .HasForeignKey(u => u.RoleId);
+                .HasForeignKey(u => u.RoleId)
+                .OnDelete(DeleteBehavior.Restrict); // prevent cascading delete if role deleted
 
-            // User → Orders (1-to-Many)
+            // -------- User → Orders (1-to-Many) --------
             modelBuilder.Entity<User>()
                 .HasMany(u => u.Orders)
                 .WithOne(o => o.User)
-                .HasForeignKey(o => o.UserId);
+                .HasForeignKey(o => o.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
-            // Order → OrderItems (1-to-Many)
+            // -------- Order → OrderItems (1-to-Many) --------
             modelBuilder.Entity<Order>()
                 .HasMany(o => o.OrderItems)
                 .WithOne(oi => oi.Order)
-                .HasForeignKey(oi => oi.OrderId);
+                .HasForeignKey(oi => oi.OrderId)
+                .OnDelete(DeleteBehavior.Cascade);
 
-            // Product → OrderItems (1-to-Many)
+            // -------- Product → OrderItems (1-to-Many) --------
             modelBuilder.Entity<Product>()
                 .HasMany(p => p.OrderItems)
                 .WithOne(oi => oi.Product)
-                .HasForeignKey(oi => oi.ProductId);
+                .HasForeignKey(oi => oi.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            // Seed roles (Admin, Customer)
+            // -------- Seed Initial Roles --------
             modelBuilder.Entity<Role>().HasData(
                 new Role { Id = 1, Name = "Admin" },
-                new Role { Id = 2, Name = "Customer" });
+                new Role { Id = 2, Name = "Customer" }
+            );
         }
     }
 }

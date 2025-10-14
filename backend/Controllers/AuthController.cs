@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BCrypt.Net;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ShopVerse.Data;
+using ShopVerse.DTOs.Auth;
 using ShopVerse.Models;
-using BCrypt.Net;
+using ShopVerse.Services;
 
 namespace ShopVerse.Controllers
 {
@@ -12,9 +14,12 @@ namespace ShopVerse.Controllers
     {
         private readonly AppDbContext _context;
 
-        public AuthController(AppDbContext context)
+        private readonly JwtService _jwtService;
+
+        public AuthController(AppDbContext context, JwtService jwtService)
         {
             _context = context;
+            _jwtService = jwtService;
         }
 
         // ---------------- Register API ----------------
@@ -63,6 +68,8 @@ namespace ShopVerse.Controllers
             if (!isPasswordValid)
                 return Unauthorized(new { message = "Invalid email or password" });
 
+            var token = _jwtService.GenerateToken(user);
+
             return Ok(new
             {
                 message = "Login successful",
@@ -77,18 +84,5 @@ namespace ShopVerse.Controllers
         }
     }
 
-    // Request DTOs
-    public class RegisterRequest
-    {
-        public string Name { get; set; } = string.Empty;
-        public string Email { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
-        public string Role { get; set; } = string.Empty;  // "Admin" or "Customer"
-    }
-
-    public class LoginRequest
-    {
-        public string Email { get; set; } = string.Empty;
-        public string Password { get; set; } = string.Empty;
-    }
+    
 }

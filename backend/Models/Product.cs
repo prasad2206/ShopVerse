@@ -1,14 +1,16 @@
-﻿namespace ShopVerse.Models
+﻿using System.Collections.Generic;
+
+namespace ShopVerse.Models
 {
     public class Product
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public decimal Price { get; set; }
-        public int StockQuantity { get; set; }
+        public int Id { get; set; }                       // Primary key
+        public string Name { get; set; } = string.Empty;   // Product name
+        public string Description { get; set; } = string.Empty; // Description
+        public decimal Price { get; set; }                // Price
+        public int StockQuantity { get; set; }            // Stock qty
 
-        // Navigation Property
-        public ICollection<OrderItem> OrderItems { get; set; }
+        // Navigation property
+        public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>(); // Related items
     }
 }

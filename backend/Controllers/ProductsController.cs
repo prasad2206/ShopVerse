@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ShopVerse.Models;
+using ShopVerse.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ShopVerse.Controllers
 {
@@ -9,8 +11,8 @@ namespace ShopVerse.Controllers
     {
         private static readonly List<Product> _products = new()
         {
-            new Product { Id = 1, Name = "Laptop", Price = 55000 },
-            new Product { Id = 2, Name = "Wireless Mouse", Price = 1200 }
+            new Product { Id = 1, Name = "Laptop", Price = 55000, Description = "Laptop", StockQuantity = 10 },
+            new Product { Id = 2, Name = "Wireless Mouse", Price = 1200, Description = "Mouse", StockQuantity = 50 }
         };
 
         [HttpGet]
@@ -28,11 +30,21 @@ namespace ShopVerse.Controllers
             return Ok(product);
         }
 
+        [Authorize(Roles = "Admin")] // Only Admin can add product
         [HttpPost]
-        public IActionResult Create(Product product)
+        public IActionResult Create([FromBody] ProductDto dto)
         {
-            product.Id = _products.Max(p => p.Id) + 1;
-            _products.Add(product);
+            // Map DTO → Model
+            var product = new Product
+            {
+                Id = _products.Max(p => p.Id) + 1, // Auto-increment
+                Name = dto.Name,                    // Map name
+                Description = dto.Description,      // Map description
+                Price = dto.Price,                  // Map price
+                StockQuantity = dto.StockQuantity   // Map stock
+            };
+
+            _products.Add(product); // Add to list
             return CreatedAtAction(nameof(GetById), new { id = product.Id }, product);
         }
     }

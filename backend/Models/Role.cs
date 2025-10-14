@@ -1,11 +1,13 @@
-﻿namespace ShopVerse.Models
+﻿using System.Collections.Generic;
+
+namespace ShopVerse.Models
 {
     public class Role
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
+        public int Id { get; set; }                     // Primary key
+        public string Name { get; set; } = string.Empty; // Role name
 
-        // Navigation Property
-        public ICollection<User> Users { get; set; }
+        // Navigation property
+        public ICollection<User> Users { get; set; } = new List<User>(); // Users in role
     }
 }
