@@ -1,4 +1,5 @@
-﻿namespace ShopVerse.Models
+﻿
+namespace ShopVerse.Models
 {
     public class OrderItem
     {

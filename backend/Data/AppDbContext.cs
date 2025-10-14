@@ -44,6 +44,11 @@ namespace ShopVerse.Data
                 .HasMany(p => p.OrderItems)
                 .WithOne(oi => oi.Product)
                 .HasForeignKey(oi => oi.ProductId);
+
+            // Seed roles (Admin, Customer)
+            modelBuilder.Entity<Role>().HasData(
+                new Role { Id = 1, Name = "Admin" },
+                new Role { Id = 2, Name = "Customer" });
         }
     }
 }
