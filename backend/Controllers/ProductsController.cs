@@ -24,45 +24,61 @@ namespace ShopVerse.Controllers
             _imageService = imageService;
         }
 
-        // 🟢 GET: api/products?search=...&category=...&minPrice=...&maxPrice=...
+        // 🟢 GET: api/products?search=...&category=...&minPrice=...&maxPrice=...&pageNumber=1&pageSize=10
         [HttpGet]
         public async Task<IActionResult> GetAll(
             [FromQuery] string? search,
             [FromQuery] string? category,
             [FromQuery] decimal? minPrice,
-            [FromQuery] decimal? maxPrice)
+            [FromQuery] decimal? maxPrice,
+            [FromQuery] int pageNumber = 1,        // Default: 1st page
+            [FromQuery] int pageSize = 10)         // Default: 10 items per page
+
         {
-            // Step 1: Base query
-            var query = _context.Products.AsQueryable(); // IQueryable → supports LINQ filters
+            if (pageNumber <= 0 || pageSize <= 0)
+                return BadRequest(new { message = "Page number and size must be positive." });
 
-            // Step 2: Apply Search Filter
+            // Step 1️: Base Query
+            var query = _context.Products.AsNoTracking().AsQueryable();
+
+
+            // Step 2️: Search Filter
             if (!string.IsNullOrWhiteSpace(search))
-            {
-                query = query.Where(p =>
-                    p.Name.Contains(search) ||              // Match in name
-                    p.Description.Contains(search));        // Match in description
-            }
+                query = query.Where(p => p.Name.Contains(search) || p.Description.Contains(search));
 
-            // Step 3: Apply Category Filter
+            // Step 3️: Category Filter
             if (!string.IsNullOrWhiteSpace(category))
-            {
                 query = query.Where(p => p.Category == category);
-            }
 
-            // Step 4: Apply Price Range Filter
+            // Step 4️: Price Range
             if (minPrice.HasValue)
-            {
                 query = query.Where(p => p.Price >= minPrice.Value);
-            }
             if (maxPrice.HasValue)
-            {
                 query = query.Where(p => p.Price <= maxPrice.Value);
-            }
 
-            // Step 5: Execute Query
-            var products = await query.ToListAsync();  // Convert to list
-            return Ok(products); // Return filtered list
+            // Step 5️: Total count before pagination
+            var totalItems = await query.CountAsync();
+
+            // Step 6️: Apply Pagination
+            var products = await query
+                .Skip((pageNumber - 1) * pageSize)   // Skip previous pages
+                .Take(pageSize)                      // Take current page items
+                .ToListAsync();
+
+            // Step 7️: Prepare Response
+            var response = new
+            {
+                TotalItems = totalItems,                         // total count
+                PageNumber = pageNumber,                         // current page
+                PageSize = pageSize,                             // page size
+                TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize),
+                Products = products                              // paginated data
+            };
+
+            // Step 8️: Return paginated result
+            return Ok(response);
         }
+
 
 
         // 🟢 GET: api/products/{id} → Get product by ID
