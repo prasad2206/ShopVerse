@@ -13,6 +13,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Registers controllers, FluentValidation, and auto-validation.
 
 builder.Services.AddControllers();
+
+builder.Services.AddScoped<IImageService, LocalImageService>(); // Image handling service
+
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 builder.Services.AddFluentValidationAutoValidation();
 
