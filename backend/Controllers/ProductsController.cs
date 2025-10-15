@@ -16,7 +16,7 @@ namespace ShopVerse.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly AppDbContext _context;  // DB context instance
-        private readonly IImageService _imageService; // 🆕 image service
+        private readonly IImageService _imageService; // image service
 
         public ProductsController(AppDbContext context, IImageService imageService)
         {
@@ -24,7 +24,7 @@ namespace ShopVerse.Controllers
             _imageService = imageService;
         }
 
-        // 🟢 GET: api/products?search=...&category=...&minPrice=...&maxPrice=...&pageNumber=1&pageSize=10
+        // GET: api/products?search=...&category=...&minPrice=...&maxPrice=...&pageNumber=1&pageSize=10
         [HttpGet]
         public async Task<IActionResult> GetAll(
             [FromQuery] string? search,
@@ -35,8 +35,17 @@ namespace ShopVerse.Controllers
             [FromQuery] int pageSize = 10)         // Default: 10 items per page
 
         {
+            // Step 0️: Validate pagination inputs
             if (pageNumber <= 0 || pageSize <= 0)
                 return BadRequest(new { message = "Page number and size must be positive." });
+
+            // Validate query filters
+            if (minPrice < 0 || maxPrice < 0)
+                return BadRequest(new { message = "Price values cannot be negative." });
+
+            if (minPrice.HasValue && maxPrice.HasValue && minPrice > maxPrice)
+                return BadRequest(new { message = "Min price cannot be greater than max price." });
+
 
             // Step 1️: Base Query
             var query = _context.Products.AsNoTracking().AsQueryable();
