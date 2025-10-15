@@ -4,8 +4,9 @@ using Microsoft.EntityFrameworkCore;
 using ShopVerse.Data;
 using ShopVerse.Models;
 using ShopVerse.DTOs;
-using ShopVerse.Services;          
-using Microsoft.AspNetCore.Http;   
+using ShopVerse.Services;
+using Microsoft.AspNetCore.Http;
+
 
 
 namespace ShopVerse.Controllers
@@ -23,13 +24,46 @@ namespace ShopVerse.Controllers
             _imageService = imageService;
         }
 
-        // 🟢 GET: api/products → Get all products
+        // 🟢 GET: api/products?search=...&category=...&minPrice=...&maxPrice=...
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(
+            [FromQuery] string? search,
+            [FromQuery] string? category,
+            [FromQuery] decimal? minPrice,
+            [FromQuery] decimal? maxPrice)
         {
-            var products = await _context.Products.ToListAsync();  // Fetch all
-            return Ok(products);
+            // Step 1: Base query
+            var query = _context.Products.AsQueryable(); // IQueryable → supports LINQ filters
+
+            // Step 2: Apply Search Filter
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(p =>
+                    p.Name.Contains(search) ||              // Match in name
+                    p.Description.Contains(search));        // Match in description
+            }
+
+            // Step 3: Apply Category Filter
+            if (!string.IsNullOrWhiteSpace(category))
+            {
+                query = query.Where(p => p.Category == category);
+            }
+
+            // Step 4: Apply Price Range Filter
+            if (minPrice.HasValue)
+            {
+                query = query.Where(p => p.Price >= minPrice.Value);
+            }
+            if (maxPrice.HasValue)
+            {
+                query = query.Where(p => p.Price <= maxPrice.Value);
+            }
+
+            // Step 5: Execute Query
+            var products = await query.ToListAsync();  // Convert to list
+            return Ok(products); // Return filtered list
         }
+
 
         // 🟢 GET: api/products/{id} → Get product by ID
         [HttpGet("{id:int}")]
@@ -109,6 +143,26 @@ namespace ShopVerse.Controllers
             await _context.SaveChangesAsync();       // Commit delete
 
             return Ok(new { message = "Product deleted successfully" });
+        }
+        // 🟢 GET: api/products/public → Public product listing (no auth)
+        [AllowAnonymous]
+        [HttpGet("public")]
+        public async Task<IActionResult> GetPublicProducts()
+        {
+            var products = await _context.Products
+                .AsNoTracking()                           // Read-only optimization
+                .Select(p => new
+                {
+                    p.Id,
+                    p.Name,
+                    p.Description,
+                    p.Price,
+                    p.Category,
+                    p.ImageUrl
+                })
+                .ToListAsync();
+
+            return Ok(products);
         }
 
     }
