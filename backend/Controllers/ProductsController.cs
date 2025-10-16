@@ -90,7 +90,7 @@ namespace ShopVerse.Controllers
 
 
 
-        // 🟢 GET: api/products/{id} → Get product by ID
+        // GET: api/products/{id} → Get product by ID
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -101,7 +101,7 @@ namespace ShopVerse.Controllers
             return Ok(product);
         }
 
-        // 🔒 POST: api/products → Add new product (Admin only)
+        // POST: api/products → Add new product (Admin only)
         [Authorize(Roles = "Admin")]
         [HttpPost]
         [RequestSizeLimit(10_000_000)] // 🆕 Max 10 MB
@@ -130,7 +130,7 @@ namespace ShopVerse.Controllers
         }
 
 
-        // 🔒 PUT: api/products/{id} → Update product (Admin only)
+        // PUT: api/products/{id} → Update product (Admin only)
         [Authorize(Roles = "Admin")]
         [HttpPut("{id:int}")]
         public async Task<IActionResult> Update(int id, [FromBody] ProductDto dto)
@@ -151,7 +151,7 @@ namespace ShopVerse.Controllers
             return Ok(product);
         }
 
-        // 🔒 DELETE: api/products/{id} → Delete product (Admin only)
+        // DELETE: api/products/{id} → Delete product (Admin only)
         [Authorize(Roles = "Admin")]
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete(int id)
@@ -160,7 +160,7 @@ namespace ShopVerse.Controllers
             if (product == null)
                 return NotFound(new { message = "Product not found" });
 
-            // 🆕 Delete associated image if exists
+            // Delete associated image if exists
             if (!string.IsNullOrEmpty(product.ImageUrl))
                 await _imageService.DeleteImageAsync(product.ImageUrl);
 
@@ -169,7 +169,7 @@ namespace ShopVerse.Controllers
 
             return Ok(new { message = "Product deleted successfully" });
         }
-        // 🟢 GET: api/products/public → Public product listing (no auth)
+        // GET: api/products/public → Public product listing (no auth)
         [AllowAnonymous]
         [HttpGet("public")]
         public async Task<IActionResult> GetPublicProducts()
