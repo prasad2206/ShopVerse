@@ -88,8 +88,7 @@ namespace ShopVerse.Controllers
             return Ok(response);
         }
 
-
-
+        
         // GET: api/products/{id} → Get product by ID
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById(int id)

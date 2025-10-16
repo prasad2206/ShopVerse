@@ -2,9 +2,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:5133/api", // backend base (HTTP)
-  // you can add timeout: 10000 if desired
-});
+  baseURL: "http://localhost:5133/api", });// backend base (HTTP)
 
 // Attach token if present in localStorage
 api.interceptors.request.use((config) => {

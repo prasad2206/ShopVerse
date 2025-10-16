@@ -9,6 +9,8 @@ import Home from "./pages/Home";
 import AdminDashboard from "./pages/AdminDashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { ToastContainer } from "react-toastify";
+import ProductList from "./pages/ProductList";
+
 
 function App() {
   return (
@@ -20,6 +22,8 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/products" element={<ProductList />} />
+
             {/* Protected admin route: only accessible when logged in and role === "Admin" */}
             <Route
               path="/admin"
