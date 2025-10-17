@@ -53,7 +53,12 @@ namespace ShopVerse.Controllers
 
             // Step 2️: Search Filter
             if (!string.IsNullOrWhiteSpace(search))
-                query = query.Where(p => p.Name.Contains(search) || p.Description.Contains(search));
+            {
+                query = query.Where(p =>
+                    (p.Name != null && p.Name.Contains(search)) ||
+                    (p.Description != null && p.Description.Contains(search))
+                );
+            }
 
             // Step 3️: Category Filter
             if (!string.IsNullOrWhiteSpace(category))
@@ -88,7 +93,7 @@ namespace ShopVerse.Controllers
             return Ok(response);
         }
 
-        
+
         // GET: api/products/{id} → Get product by ID
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById(int id)
@@ -99,6 +104,21 @@ namespace ShopVerse.Controllers
 
             return Ok(product);
         }
+
+        //GET: api/products/categories → List of unique category names
+        [HttpGet("categories")]
+        public async Task<IActionResult> GetCategories()
+        {
+            var categories = await _context.Products
+                .Where(p => !string.IsNullOrEmpty(p.Category))
+                .Select(p => p.Category!)
+                .Distinct()
+                .ToListAsync();
+
+            return Ok(categories);
+        }
+
+
 
         // POST: api/products → Add new product (Admin only)
         [Authorize(Roles = "Admin")]
