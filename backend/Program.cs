@@ -16,9 +16,21 @@ builder.Services.AddControllers();
 
 builder.Services.AddScoped<IImageService, LocalImageService>(); // Image handling service
 
+
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 builder.Services.AddFluentValidationAutoValidation();
 
+// Add CORS (for frontend localhost:5173)
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173") // vite default port
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
 
 // JWT Service
 builder.Services.AddSingleton<JwtService>();
@@ -50,6 +62,8 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+
+
 // Add services to the container
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -69,6 +83,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("AllowFrontend");
 
 app.UseAuthorization();
 
