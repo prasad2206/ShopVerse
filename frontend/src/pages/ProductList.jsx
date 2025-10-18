@@ -12,7 +12,7 @@ const ProductList = () => {
   const [category, setCategory] = useState(""); // category name as string
   const [minPrice, setMinPrice] = useState(""); // minimum price filter
   const [maxPrice, setMaxPrice] = useState(""); // maximum price filter
-  const [page, setPage] = useState(1); // current page
+  const [pageNumber, setPageNumber] = useState(1); // current page
   const [pageSize] = useState(8); // fixed page size
   const [totalPages, setTotalPages] = useState(1); // from backend response
 
@@ -23,19 +23,24 @@ const ProductList = () => {
     return () => clearTimeout(handler);
   }, [search]);
 
+  useEffect(() => {
+    setPageNumber(1);
+  }, [debouncedSearch, category, minPrice, maxPrice]);
+
   // ✅ fetch products (with filters)
   const fetchProducts = async () => {
     try {
       setLoading(true);
       setError("");
 
-      const params = {};
+      const params = {
+        pageNumber,
+        pageSize,
+      };
       if (debouncedSearch) params.search = debouncedSearch;
       if (category) params.category = category; // send category name
       if (minPrice) params.minPrice = minPrice;
       if (maxPrice) params.maxPrice = maxPrice;
-      params.page = page;
-      params.pageSize = pageSize;
 
       const res = await api.get("/products", { params });
       console.log("API response:", res.data);
@@ -68,7 +73,7 @@ const ProductList = () => {
   // re-fetch products when filters/search change
   useEffect(() => {
     fetchProducts();
-  }, [debouncedSearch, category, minPrice, maxPrice, page]);
+  }, [debouncedSearch, category, minPrice, maxPrice, pageNumber]);
 
   return (
     <div className="container mx-auto px-4 py-6">
@@ -248,8 +253,6 @@ const ProductList = () => {
                               +
                             </button>
                           </div>
-
-                          
                         </div>
                       );
                     }
@@ -272,11 +275,15 @@ const ProductList = () => {
       </div>
 
       {/* ✅ Pagination Controls */}
-      {!loading && !error && totalPages > 1 && (
+      {!loading && !error && totalPages >= 1 && (
         <nav className="d-flex justify-content-center mt-4">
           <ul className="pagination">
-            <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
-              <button className="page-link" onClick={() => setPage(page - 1)}>
+            {/* Previous */}
+            <li className={`page-item ${pageNumber === 1 ? "disabled" : ""}`}>
+              <button
+                className="page-link"
+                onClick={() => setPageNumber((prev) => Math.max(prev - 1, 1))}
+              >
                 Previous
               </button>
             </li>
@@ -285,18 +292,29 @@ const ProductList = () => {
             {Array.from({ length: totalPages }, (_, i) => (
               <li
                 key={i}
-                className={`page-item ${page === i + 1 ? "active" : ""}`}
+                className={`page-item ${pageNumber === i + 1 ? "active" : ""}`}
               >
-                <button className="page-link" onClick={() => setPage(i + 1)}>
+                <button
+                  className="page-link"
+                  onClick={() => setPageNumber(i + 1)}
+                >
                   {i + 1}
                 </button>
               </li>
             ))}
 
+            {/* Next */}
             <li
-              className={`page-item ${page === totalPages ? "disabled" : ""}`}
+              className={`page-item ${
+                pageNumber === totalPages ? "disabled" : ""
+              }`}
             >
-              <button className="page-link" onClick={() => setPage(page + 1)}>
+              <button
+                className="page-link"
+                onClick={() =>
+                  setPageNumber((prev) => Math.min(prev + 1, totalPages))
+                }
+              >
                 Next
               </button>
             </li>
