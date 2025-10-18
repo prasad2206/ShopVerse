@@ -9,8 +9,11 @@ const Login = () => {
   const navigate = useNavigate();
   const [form, setForm] = useState({ email: "", password: "" });
   const [submitting, setSubmitting] = useState(false);
+  const params = new URLSearchParams(location.search);
+  const redirect = params.get("redirect");
 
-  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) =>
+    setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,11 +23,12 @@ const Login = () => {
     if (res.success) {
       toast.success("Login successful");
       // if user is admin, redirect to admin; else home
-      const user = res.data.user ?? JSON.parse(localStorage.getItem("user") || "null");
+      const user =
+        res.data.user ?? JSON.parse(localStorage.getItem("user") || "null");
       if (user?.role === "Admin") {
         navigate("/admin");
       } else {
-        navigate("/");
+        navigate(redirect ? `/${redirect}` : "/");
       }
     } else {
       toast.error(res.message || "Login failed");
@@ -38,13 +42,29 @@ const Login = () => {
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
             <label className="form-label">Email</label>
-            <input required type="email" name="email" value={form.email} onChange={handleChange} className="form-control" />
+            <input
+              required
+              type="email"
+              name="email"
+              value={form.email}
+              onChange={handleChange}
+              className="form-control"
+            />
           </div>
           <div className="mb-3">
             <label className="form-label">Password</label>
-            <input required type="password" name="password" value={form.password} onChange={handleChange} className="form-control" />
+            <input
+              required
+              type="password"
+              name="password"
+              value={form.password}
+              onChange={handleChange}
+              className="form-control"
+            />
           </div>
-          <button className="btn btn-primary" disabled={submitting}>{submitting ? "Logging in..." : "Login"}</button>
+          <button className="btn btn-primary" disabled={submitting}>
+            {submitting ? "Logging in..." : "Login"}
+          </button>
         </form>
       </div>
     </div>
