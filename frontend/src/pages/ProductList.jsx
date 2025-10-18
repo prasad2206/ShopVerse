@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import api from "../services/api";
+import { useCart } from "../context/CartContext";
 
 const ProductList = () => {
+  const { cartItems, addToCart, updateQuantity, removeFromCart } = useCart(); // Access cart state and methods
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [search, setSearch] = useState("");
@@ -67,7 +69,6 @@ const ProductList = () => {
   useEffect(() => {
     fetchProducts();
   }, [debouncedSearch, category, minPrice, maxPrice, page]);
-
 
   return (
     <div className="container mx-auto px-4 py-6">
@@ -200,12 +201,69 @@ const ProductList = () => {
                     {desc}
                   </p>
                   <p className="fw-bold text-success mt-auto mb-2">₹{price}</p>
-                  <button
-                    className="btn btn-primary btn-sm mt-auto"
-                    onClick={() => console.log("Add to Cart:", p.name)} // placeholder
-                  >
-                    Add to Cart
-                  </button>
+                  {/* ✅ If product is already in cart → show counter + remove button */}
+                  {(() => {
+                    const itemInCart = cartItems.find((i) => i.id === p.id);
+
+                    if (itemInCart) {
+                      return (
+                        <div className="d-flex align-items-center justify-content-between mt-auto gap-2">
+                          {/* Remove button */}
+                          <button
+                            className="btn btn-outline-danger btn-sm"
+                            onClick={() => removeFromCart(p.id)}
+                          >
+                            Remove
+                          </button>
+
+                          {/* Counter */}
+                          <div
+                            className="input-group input-group-sm"
+                            style={{ width: "120px" }}
+                          >
+                            <button
+                              className="btn btn-outline-secondary"
+                              onClick={() => {
+                                if (itemInCart.qty === 1) {
+                                  removeFromCart(p.id); // remove product if qty reaches 0
+                                } else {
+                                  updateQuantity(p.id, itemInCart.qty - 1); // decrease qty
+                                }
+                              }}
+                            >
+                              -
+                            </button>
+                            <input
+                              type="number"
+                              className="form-control text-center"
+                              value={itemInCart.qty}
+                              readOnly
+                            />
+                            <button
+                              className="btn btn-outline-secondary"
+                              onClick={() =>
+                                updateQuantity(p.id, itemInCart.qty + 1)
+                              } // increase qty
+                            >
+                              +
+                            </button>
+                          </div>
+
+                          
+                        </div>
+                      );
+                    }
+
+                    // ✅ If product not in cart → show "Add to Cart" button
+                    return (
+                      <button
+                        className="btn btn-primary btn-sm mt-auto"
+                        onClick={() => addToCart(p)}
+                      >
+                        Add to Cart
+                      </button>
+                    );
+                  })()}
                 </div>
               </div>
             </div>
