@@ -4,7 +4,8 @@ import { useCart } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
 
 const CartPage = () => {
-  const { cartItems, updateQuantity, removeFromCart, clearCart, totalAmount } = useCart();
+  const { cartItems, updateQuantity, removeFromCart, clearCart, totalAmount } =
+    useCart();
   const navigate = useNavigate();
 
   // ✅ If cart empty → show message
@@ -12,18 +13,42 @@ const CartPage = () => {
     return (
       <div className="container py-5 text-center">
         <h4 className="mb-3">Your cart is empty 🛒</h4>
-        <button className="btn btn-primary" onClick={() => navigate("/products")}>
+        <button
+          className="btn btn-primary"
+          onClick={() => navigate("/products")}
+        >
           Browse Products
         </button>
       </div>
     );
   }
 
-  // ✅ Simulate checkout (dummy success)
-  const handleCheckout = () => {
-    alert("✅ Order placed successfully!");
-    clearCart();
-    navigate("/products");
+  // ✅ Checkout & place order via backend
+  const handleCheckout = async () => {
+    try {
+      // build order payload
+      const payload = {
+        items: cartItems.map((item) => ({
+          productId: item.id,
+          quantity: item.qty,
+          price: item.price,
+        })),
+        totalAmount: totalAmount,
+      };
+
+      // call backend
+      const res = await api.post("/orders", payload);
+
+      // show confirmation + clear cart
+      alert("✅ " + (res.data.message || "Order placed successfully!"));
+      const newOrderId = res.data.orderId;
+
+      clearCart();
+      navigate(`/ordersummary/${newOrderId}`);
+    } catch (err) {
+      console.error("Order placement failed:", err);
+      alert("❌ Failed to place order. Please try again.");
+    }
   };
 
   return (
@@ -48,7 +73,11 @@ const CartPage = () => {
                   <img
                     src={item.imageUrl || "https://via.placeholder.com/80"}
                     alt={item.name}
-                    style={{ width: "80px", height: "80px", objectFit: "cover" }}
+                    style={{
+                      width: "80px",
+                      height: "80px",
+                      objectFit: "cover",
+                    }}
                     className="rounded"
                   />
                   <div>
@@ -61,7 +90,10 @@ const CartPage = () => {
 
                 {/* ✅ Quantity control */}
                 <td>
-                  <div className="input-group input-group-sm" style={{ width: "110px" }}>
+                  <div
+                    className="input-group input-group-sm"
+                    style={{ width: "110px" }}
+                  >
                     <button
                       className="btn btn-outline-secondary"
                       onClick={() => updateQuantity(item.id, item.qty - 1)}

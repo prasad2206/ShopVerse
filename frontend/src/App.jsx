@@ -17,6 +17,7 @@ import { ToastContainer } from "react-toastify";
 import ProductList from "./pages/ProductList";
 import { CartProvider } from "./context/CartContext";
 import CartPage from "./pages/CartPage";
+import OrderSummary from "./pages/OrderSummary";
 
 function App() {
   return (
@@ -31,7 +32,7 @@ function App() {
               <Route path="/register" element={<Register />} />
               <Route path="/products" element={<ProductList />} />
               <Route path="/cart" element={<CartPage />} />
-
+              <Route path="/ordersummary/:id" element={<OrderSummary />} />
               {/* Protected admin route: only accessible when logged in and role === "Admin" */}
               <Route
                 path="/admin"
