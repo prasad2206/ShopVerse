@@ -2,6 +2,7 @@
 import React from "react";
 import { useCart } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
+import api from "../services/api"; // for making backend calls
 
 const CartPage = () => {
   const { cartItems, updateQuantity, removeFromCart, clearCart, totalAmount } =
@@ -23,28 +24,38 @@ const CartPage = () => {
     );
   }
 
-  // ✅ Checkout & place order via backend
+  // Checkout & place order via backend
   const handleCheckout = async () => {
     try {
-      // build order payload
+      // Step 1: Build payload that matches backend DTO
       const payload = {
+        totalAmount: totalAmount, // backend expects "TotalAmount"
         items: cartItems.map((item) => ({
-          productId: item.id,
-          quantity: item.qty,
-          price: item.price,
+          productId: item.id, // matches OrderItemDto.ProductId
+          quantity: item.qty, // matches OrderItemDto.Quantity
+          price: item.price, // matches OrderItemDto.Price
         })),
-        totalAmount: totalAmount,
       };
 
-      // call backend
-      const res = await api.post("/orders", payload);
+      // Step 2: Send POST request to backend
+      const res = await api.post("/orders", payload, {
+        // headers: {
+        //   Authorization: `Bearer ${localStorage.getItem("token")}`, // send auth token
+        // },
+      });
 
-      // show confirmation + clear cart
-      alert("✅ " + (res.data.message || "Order placed successfully!"));
-      const newOrderId = res.data.orderId;
+      // Step 3: Handle response
+      if (res.status === 200 || res.status === 201) {
+        alert("✅ " + (res.data.message || "Order placed successfully!"));
 
-      clearCart();
-      navigate(`/ordersummary/${newOrderId}`);
+        // get orderId from backend
+        const newOrderId = res.data.orderId;
+
+        clearCart(); // empty the cart
+        navigate(`/ordersummary/${newOrderId}`); // go to summary
+      } else {
+        throw new Error("Unexpected response from server");
+      }
     } catch (err) {
       console.error("Order placement failed:", err);
       alert("❌ Failed to place order. Please try again.");

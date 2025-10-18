@@ -1,19 +1,33 @@
 // src/services/authService.js
 import api from "./api";
 
+// ---------------- Register User ----------------
 export const register = async (payload) => {
-  // payload: { name, email, password } or whatever your backend expects
   const response = await api.post("/Auth/register", payload);
   return response.data;
 };
 
+// ---------------- Login User ----------------
 export const login = async (payload) => {
-  // payload: { email, password }
   const response = await api.post("/Auth/login", payload);
-  return response.data; // expect it to return { token, user } or similar
+
+  const { token, user } = response.data;
+
+  if (!token) {
+    throw new Error("No token returned from login API");
+  }
+
+  localStorage.setItem("token", token);
+  return { token, user };
 };
 
+// ---------------- Get Profile (optional) ----------------
 export const getProfile = async () => {
-  const response = await api.get("/Auth/profile"); // optional if backend offers profile
+  const response = await api.get("/Auth/profile");
   return response.data;
+};
+
+// ---------------- Logout User ----------------
+export const logout = () => {
+  localStorage.removeItem("token");
 };

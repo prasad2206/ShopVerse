@@ -28,10 +28,10 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       const data = await loginApi(credentials);
-      // Expected: data = { token: "...", user: { ... } }
-      // adapt if backend returns differently
-      const receivedToken = data.token ?? data;
-      const receivedUser = data.user ?? data;
+
+      // Extract token properly (handle object responses)
+      const receivedToken = data.token || data.jwt || data.accessToken || null; // safely handle backend naming
+      const receivedUser = data.user ?? null; // user info if available
 
       // If backend returns only token string, you might need to decode user separately.
       // Here we handle commonly returned shape.
