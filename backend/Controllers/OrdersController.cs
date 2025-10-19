@@ -92,7 +92,7 @@ namespace ShopVerse.Controllers
             return Ok(response);
         }
 
-        // ✅ GET: api/orders (for admin) → all orders list (Day 8)
+        // ✅ GET: api/orders (for admin) → all orders list 
         [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> GetAllOrders()
@@ -100,14 +100,19 @@ namespace ShopVerse.Controllers
             var orders = await _context.Orders
                 .Include(o => o.User)
                 .OrderByDescending(o => o.OrderDate)
-                .Select(o => new
-                {
-                    o.Id,
-                    o.OrderDate,
-                    o.TotalAmount,
-                    o.Status,
-                    CustomerName = o.User.Name
-                })
+               .Select(o => new
+               {
+                   o.Id,
+                   o.OrderDate,
+                   o.TotalAmount,
+                   o.Status,
+                   o.PaymentId,
+                   Customer = new
+                   {
+                       Name = o.User.Name,
+                       Email = o.User.Email
+                   }
+               })
                 .ToListAsync();
 
             return Ok(orders);

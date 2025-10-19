@@ -73,6 +73,7 @@ namespace ShopVerse.Controllers
             return Ok(new
             {
                 message = "Login successful",
+                token,
                 user = new
                 {
                     user.Id,

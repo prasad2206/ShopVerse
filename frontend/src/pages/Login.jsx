@@ -23,8 +23,7 @@ const Login = () => {
     if (res.success) {
       toast.success("Login successful");
       // if user is admin, redirect to admin; else home
-      const user =
-        res.data.user ?? JSON.parse(localStorage.getItem("user") || "null");
+      const user = res.data.user;
       if (user?.role === "Admin") {
         navigate("/admin");
       } else {
