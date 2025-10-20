@@ -26,7 +26,7 @@ export const CartProvider = ({ children }) => {
       if (existing) {
         // increase quantity
         return prev.map((item) =>
-          item.id === product.id ? { ...item, qty: item.qty + 1 } : item
+          item.id === product.id ? { ...item, qty: item.qty + 1 } : item,
         );
       }
       // add new item
@@ -43,7 +43,7 @@ export const CartProvider = ({ children }) => {
   const updateQuantity = (id, qty) => {
     if (qty < 1) return;
     setCartItems((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, qty } : item))
+      prev.map((item) => (item.id === id ? { ...item, qty } : item)),
     );
   };
 
@@ -53,7 +53,7 @@ export const CartProvider = ({ children }) => {
   // ✅ Calculate total price
   const totalAmount = cartItems.reduce(
     (sum, item) => sum + item.price * item.qty,
-    0
+    0,
   );
 
   return (

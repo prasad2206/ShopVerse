@@ -22,8 +22,10 @@ const OrderSummary = () => {
     fetchOrder();
   }, [id]);
 
-  if (loading) return <div className="container py-5 text-center">Loading order...</div>;
-  if (!order) return <div className="container py-5 text-center">Order not found.</div>;
+  if (loading)
+    return <div className="container py-5 text-center">Loading order...</div>;
+  if (!order)
+    return <div className="container py-5 text-center">Order not found.</div>;
 
   return (
     <div className="container py-4">
@@ -33,7 +35,9 @@ const OrderSummary = () => {
         <div className="card-body">
           <h5>Order ID: #{order.id}</h5>
           <p>Date: {new Date(order.createdAt).toLocaleString()}</p>
-          <p>Status: <span className="badge bg-success">{order.status}</span></p>
+          <p>
+            Status: <span className="badge bg-success">{order.status}</span>
+          </p>
           <h5 className="mt-3">Total: ₹{order.totalAmount}</h5>
         </div>
       </div>

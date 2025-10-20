@@ -14,6 +14,7 @@ import Home from "./pages/Home";
 import AdminDashboard from "./pages/AdminDashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import ProductList from "./pages/ProductList";
 import { CartProvider } from "./context/CartContext";
 import CartPage from "./pages/CartPage";
@@ -45,7 +46,7 @@ function App() {
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>
           </div>
-          <ToastContainer />
+          <ToastContainer position="top-right" autoClose={1500} />
         </Router>
       </CartProvider>
     </AuthProvider>
