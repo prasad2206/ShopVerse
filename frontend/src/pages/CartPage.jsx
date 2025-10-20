@@ -27,6 +27,11 @@ const CartPage = () => {
   // Checkout & place order via backend
   const handleCheckout = async () => {
     try {
+      //   // Step 0: Prevent checkout if cart is empty
+      // if (cartItems.length === 0) {
+      //   toast.warning("🛒 Your cart is empty! Please add some products before checkout.");
+      //   return; // stop function here
+      // }
       // Step 1: Build payload that matches backend DTO
       const payload = {
         totalAmount: totalAmount, // backend expects "TotalAmount"
@@ -46,7 +51,9 @@ const CartPage = () => {
 
       // Step 3: Handle response
       if (res.status === 200 || res.status === 201) {
-        alert("✅ " + (res.data.message || "Order placed successfully!"));
+        toast.success(
+          "✅ " + (res.data.message || "Order placed successfully!"),
+        );
 
         // get orderId from backend
         const newOrderId = res.data.orderId;
@@ -58,7 +65,7 @@ const CartPage = () => {
       }
     } catch (err) {
       console.error("Order placement failed:", err);
-      alert("❌ Failed to place order. Please try again.");
+      toast.error("❌ Failed to place order. Please try again.");
     }
   };
 

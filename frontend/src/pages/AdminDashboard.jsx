@@ -103,7 +103,6 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     if (activeTab === "orders") fetchOrders();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
   // Pagination change

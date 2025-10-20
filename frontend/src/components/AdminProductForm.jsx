@@ -39,7 +39,9 @@ const AdminProductForm = ({
       <div className="modal-dialog modal-lg" role="document">
         <form onSubmit={onSubmit} className="modal-content">
           <div className="modal-header">
-            <h5 className="modal-title">{isEditMode ? "Edit Product" : "Add Product"}</h5>
+            <h5 className="modal-title">
+              {isEditMode ? "Edit Product" : "Add Product"}
+            </h5>
             <button type="button" className="btn-close" onClick={onClose} />
           </div>
           <div className="modal-body">
@@ -109,7 +111,9 @@ const AdminProductForm = ({
                   className="form-control"
                   placeholder="https://..."
                 />
-                <small className="text-muted">If you upload a file, it will be used instead.</small>
+                <small className="text-muted">
+                  If you upload a file, it will be used instead.
+                </small>
               </div>
 
               <div className="col-md-4">
@@ -125,11 +129,23 @@ const AdminProductForm = ({
           </div>
 
           <div className="modal-footer">
-            <button type="button" className="btn btn-secondary" onClick={onClose}>
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={onClose}
+            >
               Cancel
             </button>
-            <button type="submit" className="btn btn-primary" disabled={modalLoading}>
-              {modalLoading ? "Saving..." : isEditMode ? "Save changes" : "Create product"}
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={modalLoading}
+            >
+              {modalLoading
+                ? "Saving..."
+                : isEditMode
+                  ? "Save changes"
+                  : "Create product"}
             </button>
           </div>
         </form>
