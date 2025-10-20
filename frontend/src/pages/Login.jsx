@@ -37,34 +37,36 @@ const Login = () => {
   return (
     <div className="row justify-content-center">
       <div className="col-md-5">
-        <h2>Login</h2>
-        <form onSubmit={handleSubmit}>
-          <div className="mb-3">
-            <label className="form-label">Email</label>
+        <div className="card p-4 shadow-sm">
+          <h2 className="mb-4">Login</h2>
+          <form onSubmit={handleSubmit}>
             <input
               required
               type="email"
               name="email"
               value={form.email}
               onChange={handleChange}
-              className="form-control"
+              className="form-control mb-3"
+              placeholder="Email"
             />
-          </div>
-          <div className="mb-3">
-            <label className="form-label">Password</label>
             <input
               required
               type="password"
               name="password"
               value={form.password}
               onChange={handleChange}
-              className="form-control"
+              className="form-control mb-3"
+              placeholder="Password"
             />
-          </div>
-          <button className="btn btn-primary" disabled={submitting}>
-            {submitting ? "Logging in..." : "Login"}
-          </button>
-        </form>
+            <button
+              className="btn btn-primary w-100"
+              disabled={submitting}
+              type="submit"
+            >
+              {submitting ? "Logging in..." : "Login"}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );

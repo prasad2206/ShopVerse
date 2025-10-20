@@ -23,14 +23,13 @@ const ProductCard = ({ product, onAddToCart }) => {
       : (product.description ?? ""); // Default to empty string if no description
 
   return (
-    <div className="card h-100">
+    <div className="card shadow-sm border-0 p-3 h-100">
       <div style={{ height: 200, overflow: "hidden" }}>
         {/* Image with fallback */}
         <img
           src={image}
           alt={name}
-          className="card-img-top"
-          style={{ width: "100%", height: "200px", objectFit: "cover" }}
+          className="card-img-top product-img"
         />
       </div>
 

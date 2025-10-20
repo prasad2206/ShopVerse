@@ -1,7 +1,7 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
+import { NavLink, Link, useNavigate } from "react-router-dom";
 
 const Navbar = () => {
   const { user, token, logout } = useAuth();
@@ -14,10 +14,10 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-light bg-light">
+    <nav className="navbar navbar-expand-lg navbar-light bg-light shadow-sm px-4 py-2">
       <div className="container">
-        <Link className="navbar-brand" to="/">
-          MyShop
+        <Link className="navbar-brand fw-bold text-primary fs-4" to="/">
+          ShopVerse
         </Link>
 
         <button
@@ -33,36 +33,58 @@ const Navbar = () => {
           <ul className="navbar-nav ms-auto">
             {/* Always visible links */}
             <li className="nav-item">
-              <Link className="nav-link" to="/">
+              <NavLink
+                to="/"
+                className={({ isActive }) =>
+                  isActive ? "nav-link active" : "nav-link"
+                }
+              >
                 Home
-              </Link>
+              </NavLink>
             </li>
             <li className="nav-item">
-              <Link className="nav-link" to="/products">
+              <NavLink
+                to="/products"
+                className={({ isActive }) =>
+                  isActive ? "nav-link active" : "nav-link"
+                }
+              >
                 Products
-              </Link>
+              </NavLink>
             </li>
             <li className="nav-item">
-              <Link
-                className="nav-link"
-                to={token ? "/cart" : "/login?redirect=cart"} // ✅ redirect param if not logged in
+              <NavLink
+                to={token ? "/cart" : "/login?redirect=cart"} // redirect param if not logged in
+                className={({ isActive }) =>
+                  isActive ? "nav-link active" : "nav-link"
+                }
               >
                 Cart ({cartItems.length})
-              </Link>
+              </NavLink>
             </li>
 
             {/* For non-authenticated users */}
             {!token && (
               <>
                 <li className="nav-item">
-                  <Link className="nav-link" to="/login">
+                  <NavLink
+                    to="/login"
+                    className={({ isActive }) =>
+                      isActive ? "nav-link active" : "nav-link"
+                    }
+                  >
                     Login
-                  </Link>
+                  </NavLink>
                 </li>
                 <li className="nav-item">
-                  <Link className="nav-link" to="/register">
+                  <NavLink
+                    to="/register"
+                    className={({ isActive }) =>
+                      isActive ? "nav-link active" : "nav-link"
+                    }
+                  >
                     Register
-                  </Link>
+                  </NavLink>
                 </li>
               </>
             )}
@@ -72,9 +94,26 @@ const Navbar = () => {
               <>
                 {user?.role === "Admin" && (
                   <li className="nav-item">
-                    <Link className="nav-link" to="/admin">
-                      Admin
-                    </Link>
+                    <NavLink
+                      to="/admin"
+                      className={({ isActive }) =>
+                        isActive ? "nav-link active" : "nav-link"
+                      }
+                    >
+                      Dashboard
+                    </NavLink>
+                  </li>
+                )}
+                {user?.role === "Customer" && (
+                  <li className="nav-item">
+                    <NavLink
+                      to="/orders"
+                      className={({ isActive }) =>
+                        isActive ? "nav-link active" : "nav-link"
+                      }
+                    >
+                      My Orders
+                    </NavLink>
                   </li>
                 )}
                 <li className="nav-item">
@@ -82,10 +121,10 @@ const Navbar = () => {
                     Hi, {user?.name ?? user?.email ?? "User"}
                   </span>
                 </li>
-                <li className="nav-item">
+                <li className="nav-item d-flex align-items-center">
                   <button
-                    className="btn btn-link nav-link"
                     onClick={handleLogout}
+                    className="btn btn-outline-danger btn-sm ms-3"
                   >
                     Logout
                   </button>
