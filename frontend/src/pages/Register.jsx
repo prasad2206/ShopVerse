@@ -33,44 +33,44 @@ const Register = () => {
   return (
     <div className="row justify-content-center">
       <div className="col-md-6">
-        <h2>Register</h2>
-        <form onSubmit={handleSubmit}>
-          <div className="mb-3">
-            <label className="form-label">Name</label>
+        <div className="card p-4 shadow-sm">
+          <h2 className="mb-4">Register</h2>
+          <form onSubmit={handleSubmit}>
             <input
               required
               name="name"
               value={form.name}
               onChange={handleChange}
-              className="form-control"
+              className="form-control mb-3"
+              placeholder="Name"
             />
-          </div>
-          <div className="mb-3">
-            <label className="form-label">Email</label>
             <input
               required
               type="email"
               name="email"
               value={form.email}
               onChange={handleChange}
-              className="form-control"
+              className="form-control mb-3"
+              placeholder="Email"
             />
-          </div>
-          <div className="mb-3">
-            <label className="form-label">Password</label>
             <input
               required
               type="password"
               name="password"
               value={form.password}
               onChange={handleChange}
-              className="form-control"
+              className="form-control mb-3"
+              placeholder="Password"
             />
-          </div>
-          <button className="btn btn-primary" disabled={submitting}>
-            {submitting ? "Registering..." : "Register"}
-          </button>
-        </form>
+            <button
+              className="btn btn-primary w-100"
+              disabled={submitting}
+              type="submit"
+            >
+              {submitting ? "Registering..." : "Register"}
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );

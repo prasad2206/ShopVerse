@@ -19,6 +19,7 @@ import ProductList from "./pages/ProductList";
 import { CartProvider } from "./context/CartContext";
 import CartPage from "./pages/CartPage";
 import OrderSummary from "./pages/OrderSummary";
+import Footer from "./components/Footer";
 
 function App() {
   return (
@@ -48,6 +49,7 @@ function App() {
           </div>
           <ToastContainer position="top-right" autoClose={1500} />
         </Router>
+        <Footer />
       </CartProvider>
     </AuthProvider>
   );

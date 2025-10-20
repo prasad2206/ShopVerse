@@ -37,118 +37,118 @@ const AdminProductForm = ({
   return (
     <div className="modal show d-block" tabIndex="-1" role="dialog">
       <div className="modal-dialog modal-lg" role="document">
-        <form onSubmit={onSubmit} className="modal-content">
-          <div className="modal-header">
-            <h5 className="modal-title">
-              {isEditMode ? "Edit Product" : "Add Product"}
-            </h5>
-            <button type="button" className="btn-close" onClick={onClose} />
-          </div>
-          <div className="modal-body">
-            <div className="row g-3">
-              <div className="col-md-8">
-                <label className="form-label">Name</label>
-                <input
-                  name="name"
-                  value={form.name}
-                  onChange={handleChange}
-                  className="form-control"
-                  required
-                />
-              </div>
+        <div className="card p-4 shadow-sm w-100">
+          <form onSubmit={onSubmit} className="modal-content border-0 bg-transparent">
+            <div className="modal-header border-0">
+              <h5 className="modal-title">
+                {isEditMode ? "Edit Product" : "Add Product"}
+              </h5>
+              <button type="button" className="btn-close" onClick={onClose} />
+            </div>
+            <div className="modal-body">
+              <div className="row g-3">
+                <div className="col-md-8">
+                  <input
+                    name="name"
+                    value={form.name}
+                    onChange={handleChange}
+                    className="form-control mb-3"
+                    required
+                    placeholder="Name"
+                  />
+                </div>
 
-              <div className="col-md-4">
-                <label className="form-label">Category</label>
-                <input
-                  name="category"
-                  value={form.category}
-                  onChange={handleChange}
-                  className="form-control"
-                />
-              </div>
+                <div className="col-md-4">
+                  <input
+                    name="category"
+                    value={form.category}
+                    onChange={handleChange}
+                    className="form-control mb-3"
+                    placeholder="Category"
+                  />
+                </div>
 
-              <div className="col-md-4">
-                <label className="form-label">Price</label>
-                <input
-                  name="price"
-                  type="number"
-                  step="0.01"
-                  value={form.price}
-                  onChange={handleChange}
-                  className="form-control"
-                  required
-                />
-              </div>
+                <div className="col-md-4">
+                  <input
+                    name="price"
+                    type="number"
+                    step="0.01"
+                    value={form.price}
+                    onChange={handleChange}
+                    className="form-control mb-3"
+                    required
+                    placeholder="Price"
+                  />
+                </div>
 
-              <div className="col-md-4">
-                <label className="form-label">Stock Quantity</label>
-                <input
-                  name="stockQuantity"
-                  type="number"
-                  value={form.stockQuantity}
-                  onChange={handleChange}
-                  className="form-control"
-                />
-              </div>
+                <div className="col-md-4">
+                  <input
+                    name="stockQuantity"
+                    type="number"
+                    value={form.stockQuantity}
+                    onChange={handleChange}
+                    className="form-control mb-3"
+                    placeholder="Stock Quantity"
+                  />
+                </div>
 
-              <div className="col-12">
-                <label className="form-label">Description</label>
-                <textarea
-                  name="description"
-                  value={form.description}
-                  onChange={handleChange}
-                  rows={3}
-                  className="form-control"
-                />
-              </div>
+                <div className="col-12">
+                  <textarea
+                    name="description"
+                    value={form.description}
+                    onChange={handleChange}
+                    rows={3}
+                    className="form-control mb-3"
+                    placeholder="Description"
+                  />
+                </div>
 
-              <div className="col-md-8">
-                <label className="form-label">Image URL (optional)</label>
-                <input
-                  name="imageUrl"
-                  value={form.imageUrl}
-                  onChange={handleChange}
-                  className="form-control"
-                  placeholder="https://..."
-                />
-                <small className="text-muted">
-                  If you upload a file, it will be used instead.
-                </small>
-              </div>
+                <div className="col-md-8">
+                  <input
+                    name="imageUrl"
+                    value={form.imageUrl}
+                    onChange={handleChange}
+                    className="form-control mb-3"
+                    placeholder="Image URL (optional)"
+                  />
+                  <small className="text-muted">
+                    If you upload a file, it will be used instead.
+                  </small>
+                </div>
 
-              <div className="col-md-4">
-                <label className="form-label">Upload Image (optional)</label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="form-control"
-                  onChange={handleFileChange}
-                />
+                <div className="col-md-4">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="form-control mb-3"
+                    onChange={handleFileChange}
+                  />
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="modal-footer">
-            <button
-              type="button"
-              className="btn btn-secondary"
-              onClick={onClose}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="btn btn-primary"
-              disabled={modalLoading}
-            >
-              {modalLoading
-                ? "Saving..."
-                : isEditMode
+            <div className="modal-footer border-0">
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={onClose}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="btn btn-primary w-100"
+                disabled={modalLoading}
+              >
+                {modalLoading
+                  ? "Saving..."
+                  : isEditMode
                   ? "Save changes"
                   : "Create product"}
-            </button>
-          </div>
-        </form>
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );

@@ -169,15 +169,6 @@ const AdminDashboard = () => {
       }
 
       if (isEditMode) {
-        // Edit: your backend Update expects [FromBody] ProductDto (JSON). Image update flow:
-        // - We will support updating imageUrl via URL field.
-        // - If user uploaded new image, call endpoint that accepts multipart (but current Update uses [FromBody]).
-        // Since backend Update is [FromBody] in your code, we will:
-        //   - If an image file is provided, upload via a temporary /api/uploads (if exists) OR
-        //     fallback to sending only imageUrl (assume admin will provide URL) -- to keep compatibility,
-        //     we'll attempt PUT with JSON and imageUrl if present.
-        //
-        // For now: send JSON PUT as backend expects.
         const payload = {
           name: form.name,
           description: form.description,
@@ -192,17 +183,13 @@ const AdminDashboard = () => {
         setShowModal(false);
         fetchProducts(pageNumber);
       } else {
-        // Create: your backend Create action expects [FromForm] ProductDto (multipart/form-data)
-        // So we need to send FormData when creating (supports imageFile)
         const fd = new FormData();
         fd.append("Name", form.name);
         fd.append("Description", form.description || "");
         fd.append("Price", form.price || 0);
         fd.append("StockQuantity", form.stockQuantity || 0);
         fd.append("Category", form.category || "");
-        // If admin typed a direct image URL, include ImageUrl (backend uses it when ImageFile == null)
         if (form.imageUrl) fd.append("ImageUrl", form.imageUrl);
-        // If a file selected, append as ImageFile (backend IImageService will save it)
         if (imageFileRef.current) fd.append("ImageFile", imageFileRef.current);
 
         const resp = await api.post("/products", fd, {
@@ -211,7 +198,6 @@ const AdminDashboard = () => {
 
         toast.success("Product created");
         setShowModal(false);
-        // After create, reload page 1 (new item may appear)
         fetchProducts(1);
       }
     } catch (err) {
@@ -231,8 +217,6 @@ const AdminDashboard = () => {
     try {
       await api.delete(`/products/${id}`);
       toast.success("Product deleted");
-      // If current page becomes empty after delete, go back one page if possible
-      // Simply re-fetch current page
       fetchProducts(pageNumber);
     } catch (err) {
       console.error("Delete failed:", err);
@@ -279,11 +263,11 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="container">
+    <div className="container-fluid">
       <h1 className="mb-4">Admin Dashboard</h1>
 
       {/* Tabs */}
-      <ul className="nav nav-tabs mb-3">
+      <ul className="nav nav-tabs mb-4">
         <li className="nav-item">
           <button
             className={`nav-link ${activeTab === "products" ? "active" : ""}`}
@@ -304,7 +288,7 @@ const AdminDashboard = () => {
 
       {/* Products tab */}
       {activeTab === "products" && (
-        <div>
+        <div className="p-4 bg-white rounded shadow-sm">
           <div className="d-flex justify-content-between align-items-center mb-3">
             <h4 className="m-0">Manage Products</h4>
             <div>
@@ -314,7 +298,6 @@ const AdminDashboard = () => {
             </div>
           </div>
 
-          {/* Loading / Error */}
           {loading && (
             <div className="d-flex align-items-center gap-2">
               <div className="spinner-border" role="status" />
@@ -325,7 +308,6 @@ const AdminDashboard = () => {
             <div className="alert alert-danger">{error}</div>
           )}
 
-          {/* Products table */}
           {!loading && !error && (
             <>
               <div className="table-responsive">
@@ -354,7 +336,6 @@ const AdminDashboard = () => {
                 </table>
               </div>
 
-              {/* Pagination */}
               <nav className="d-flex justify-content-center">
                 <ul className="pagination">
                   <li
@@ -407,12 +388,11 @@ const AdminDashboard = () => {
         </div>
       )}
 
-      {/* Orders tab (placeholder) */}
+      {/* Orders tab */}
       {activeTab === "orders" && (
-        <div>
+        <div className="p-4 bg-white rounded shadow-sm">
           <h4>Orders</h4>
 
-          {/* Loading */}
           {ordersLoading && (
             <div className="d-flex align-items-center gap-2">
               <div className="spinner-border" role="status" />
@@ -420,12 +400,10 @@ const AdminDashboard = () => {
             </div>
           )}
 
-          {/* Error */}
           {!ordersLoading && ordersError && (
             <div className="alert alert-danger">{ordersError}</div>
           )}
 
-          {/* Orders table */}
           {!ordersLoading && !ordersError && (
             <div className="table-responsive">
               <table className="table table-bordered align-middle">
