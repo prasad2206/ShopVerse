@@ -1,5 +1,7 @@
 // src/components/ProductCard.jsx
 import React from "react";
+import { useNavigate } from "react-router-dom";
+import { useCart } from "../context/CartContext";
 
 /**
  * ProductCard props:
@@ -7,6 +9,16 @@ import React from "react";
  * - onAddToCart: optional callback
  */
 const ProductCard = ({ product, onAddToCart }) => {
+  const navigate = useNavigate();
+  const { addToCart, clearCart } = useCart();
+
+  // "Buy Now" handler: clears existing cart, adds current product, and redirects to cart
+  const handleBuyNow = (product) => {
+    clearCart();        // empty old cart
+    addToCart(product); // add single product
+    navigate("/cart");  // redirect to cart
+  };
+
   // Safe field mapping: Handles multiple possible field names for image
   const image =
     product.imageURL ?? // Prefer imageURL if available
@@ -57,23 +69,26 @@ const ProductCard = ({ product, onAddToCart }) => {
           </p>
         )}
 
-        <div className="mt-auto d-flex justify-content-between align-items-center">
-          {/* Display price */}
-          <div className="fw-bold">₹{price}</div>
-          {/* Show 'Add to Cart' button if onAddToCart is provided */}
-          {onAddToCart ? (
+        {/* Price and action buttons */}
+        <div className="mt-auto pt-2">
+          <div className="fw-bold mb-2 text-success fs-6">₹{price}</div>
+
+          {/* Button section with Add to Cart and Buy Now */}
+          <div className="d-flex flex-wrap gap-2 mt-2">
             <button
-              className="btn btn-sm btn-outline-primary"
-              onClick={() => onAddToCart(product)}
+              className="btn btn-outline-primary flex-fill"
+              onClick={() => addToCart(product)}
             >
-              Add
+              Add to Cart
             </button>
-          ) : (
-            // 'View' button is shown if no onAddToCart is provided
-            <button className="btn btn-sm btn-primary" disabled>
-              View
+
+            <button
+              className="btn btn-primary flex-fill"
+              onClick={() => handleBuyNow(product)}
+            >
+              Buy Now
             </button>
-          )}
+          </div>
         </div>
       </div>
     </div>

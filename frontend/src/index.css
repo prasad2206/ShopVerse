@@ -88,3 +88,11 @@ body {
 .page-container {
   padding: 2rem;
 }
+
+.card {
+  min-height: 100%;
+}
+.card-body {
+  display: flex;
+  flex-direction: column;
+}
