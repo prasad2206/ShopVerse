@@ -20,6 +20,7 @@ import { CartProvider } from "./context/CartContext";
 import CartPage from "./pages/CartPage";
 import OrderSummary from "./pages/OrderSummary";
 import Footer from "./components/Footer";
+import MyOrders from "./pages/MyOrders";
 
 function App() {
   return (
@@ -35,6 +36,7 @@ function App() {
               <Route path="/products" element={<ProductList />} />
               <Route path="/cart" element={<CartPage />} />
               <Route path="/ordersummary/:id" element={<OrderSummary />} />
+              <Route path="/orders" element={<ProtectedRoute><MyOrders /></ProtectedRoute>} />
               {/* Protected admin route: only accessible when logged in and role === "Admin" */}
               <Route
                 path="/admin"

@@ -43,19 +43,20 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("token", receivedToken);
 
       api.defaults.headers.common["Authorization"] = `Bearer ${receivedToken}`;
-      let finalUser = receivedUser;
 
-      // If no user info returned, fetch profile
-      try {
-        const profile = await api.get("/Auth/profile");
-        setUser(profile.data);
-        localStorage.setItem("user", JSON.stringify(profile.data));
-      } catch (profileError) {
-        console.warn("Failed to fetch profile:", profileError);
+      // If user info was returned use it, otherwise try fetching profile
+      if (receivedUser) {
+        setUser(receivedUser);
+        localStorage.setItem("user", JSON.stringify(receivedUser));
+      } else {
+        try {
+          const profile = await api.get("/Auth/profile");
+          setUser(profile.data);
+          localStorage.setItem("user", JSON.stringify(profile.data));
+        } catch (profileError) {
+          console.warn("Failed to fetch profile:", profileError);
+        }
       }
-
-      setUser(finalUser);
-      localStorage.setItem("user", JSON.stringify(finalUser));
 
       setLoading(false);
       return {

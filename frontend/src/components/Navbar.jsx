@@ -16,7 +16,7 @@ const Navbar = () => {
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light shadow-sm px-4 py-2">
       <div className="container">
-        <Link className="navbar-brand fw-bold text-primary fs-4" to="/">
+        <Link className="navbar-brand fw-bold text-primary fs-4" to="/products">
           ShopVerse
         </Link>
 
@@ -32,7 +32,7 @@ const Navbar = () => {
         <div className="collapse navbar-collapse" id="navMenu">
           <ul className="navbar-nav ms-auto">
             {/* Always visible links */}
-            <li className="nav-item">
+            {/* <li className="nav-item">
               <NavLink
                 to="/"
                 className={({ isActive }) =>
@@ -41,7 +41,7 @@ const Navbar = () => {
               >
                 Home
               </NavLink>
-            </li>
+            </li> */}
             <li className="nav-item">
               <NavLink
                 to="/products"
@@ -49,7 +49,7 @@ const Navbar = () => {
                   isActive ? "nav-link active" : "nav-link"
                 }
               >
-                Products
+                Home
               </NavLink>
             </li>
             <li className="nav-item">
