@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import api from "../services/api";
 import { useCart } from "../context/CartContext";
+import ProductCard from "../components/ProductCard";
 
 const ProductList = () => {
   const { cartItems, addToCart, updateQuantity, removeFromCart } = useCart(); // Access cart state and methods
@@ -16,7 +17,7 @@ const ProductList = () => {
   const [pageSize] = useState(8); // fixed page size
   const [totalPages, setTotalPages] = useState(1); // from backend response
 
-  // ✅ debounce search input (wait 500ms after typing)
+  // debounce search input (wait 500ms after typing)
   const [debouncedSearch, setDebouncedSearch] = useState(search);
   useEffect(() => {
     const handler = setTimeout(() => setDebouncedSearch(search), 500);
@@ -27,7 +28,7 @@ const ProductList = () => {
     setPageNumber(1);
   }, [debouncedSearch, category, minPrice, maxPrice]);
 
-  // ✅ fetch products (with filters)
+  // fetch products (with filters)
   const fetchProducts = async () => {
     try {
       setLoading(true);
@@ -46,7 +47,7 @@ const ProductList = () => {
       console.log("API response:", res.data);
 
       setProducts(res.data.products);
-      setTotalPages(res.data.totalPages || 1); // ✅ update pagination count if backend sends it
+      setTotalPages(res.data.totalPages || 1); // update pagination count if backend sends it
     } catch (err) {
       console.error(err);
       setError(err.response?.data?.message || "Failed to load products");
@@ -55,7 +56,7 @@ const ProductList = () => {
     }
   };
 
-  // ✅ fetch categories for filter dropdown
+  // fetch categories for filter dropdown
   const fetchCategories = async () => {
     try {
       const resp = await api.get("/products/categories");
@@ -79,7 +80,7 @@ const ProductList = () => {
     <div className="container mx-auto px-4 py-6">
       <h2 className="text-2xl font-semibold mb-4">Products</h2>
 
-      {/* ✅ Filters Section */}
+      {/* Filters Section */}
       <div className="row mb-4">
         {/* Search */}
         <div className="col-md-3 mb-2">
@@ -108,7 +109,7 @@ const ProductList = () => {
           </select>
         </div>
 
-        {/* ✅ Price Range */}
+        {/* Price Range */}
         <div className="col-md-2 mb-2">
           <input
             type="number"
@@ -151,7 +152,7 @@ const ProductList = () => {
         </div>
       </div>
 
-      {/* ✅ Loader - Bootstrap spinner */}
+      {/* Loader - Bootstrap spinner */}
       {loading && (
         <div className="d-flex flex-column align-items-center justify-content-center py-4">
           <div className="spinner-border text-primary" role="status">
@@ -161,14 +162,14 @@ const ProductList = () => {
         </div>
       )}
 
-      {/* ✅ Error - Bootstrap alert */}
+      {/* Error - Bootstrap alert */}
       {!loading && error && (
         <div className="alert alert-danger mt-3" role="alert">
           ⚠️ {error}
         </div>
       )}
 
-      {/* ✅ Product grid container */}
+      {/* Product grid container */}
       <div className="row">
         {/* No products message */}
         {products.length === 0 && !loading && !error && (
@@ -177,104 +178,16 @@ const ProductList = () => {
           </div>
         )}
 
-        {/* ✅ Product cards grid */}
-        {products.map((p) => {
-          const image =
-            p.imageUrl ||
-            p.imageURL ||
-            "https://via.placeholder.com/400x300?text=No+Image"; // fallback image
-          const name = p.name || "Unnamed Product"; // safe name
-          const category = p.categoryName || p.category || "General"; // safe category
-          const price = p.price || 0; // safe price
-          const desc = p.description
-            ? p.description.slice(0, 100) + "..."
-            : "No description available"; // short desc
+        {/* Product cards grid */}
 
-          return (
-            <div key={p.id} className="col-md-3 mb-4">
-              <div className="card h-100 shadow-sm">
-                <img
-                  src={image}
-                  className="card-img-top"
-                  alt={name}
-                  style={{ height: "200px", objectFit: "cover" }}
-                />
-                <div className="card-body d-flex flex-column">
-                  <h5 className="card-title">{name}</h5>
-                  <p className="text-muted mb-1">{category}</p>
-                  <p className="card-text text-truncate" title={desc}>
-                    {desc}
-                  </p>
-                  <p className="fw-bold text-success mt-auto mb-2">₹{price}</p>
-                  {/* ✅ If product is already in cart → show counter + remove button */}
-                  {(() => {
-                    const itemInCart = cartItems.find((i) => i.id === p.id);
-
-                    if (itemInCart) {
-                      return (
-                        <div className="d-flex align-items-center justify-content-between mt-auto gap-2">
-                          {/* Remove button */}
-                          <button
-                            className="btn btn-outline-danger btn-sm"
-                            onClick={() => removeFromCart(p.id)}
-                          >
-                            Remove
-                          </button>
-
-                          {/* Counter */}
-                          <div
-                            className="input-group input-group-sm"
-                            style={{ width: "120px" }}
-                          >
-                            <button
-                              className="btn btn-outline-secondary"
-                              onClick={() => {
-                                if (itemInCart.qty === 1) {
-                                  removeFromCart(p.id); // remove product if qty reaches 0
-                                } else {
-                                  updateQuantity(p.id, itemInCart.qty - 1); // decrease qty
-                                }
-                              }}
-                            >
-                              -
-                            </button>
-                            <input
-                              type="number"
-                              className="form-control text-center"
-                              value={itemInCart.qty}
-                              readOnly
-                            />
-                            <button
-                              className="btn btn-outline-secondary"
-                              onClick={() =>
-                                updateQuantity(p.id, itemInCart.qty + 1)
-                              } // increase qty
-                            >
-                              +
-                            </button>
-                          </div>
-                        </div>
-                      );
-                    }
-
-                    // ✅ If product not in cart → show "Add to Cart" button
-                    return (
-                      <button
-                        className="btn btn-primary btn-sm mt-auto"
-                        onClick={() => addToCart(p)}
-                      >
-                        Add to Cart
-                      </button>
-                    );
-                  })()}
-                </div>
-              </div>
-            </div>
-          );
-        })}
+        {products.map((p) => (
+          <div key={p.id} className="col-md-3 mb-4">
+            <ProductCard product={p} />
+          </div>
+        ))}
       </div>
 
-      {/* ✅ Pagination Controls */}
+      {/* Pagination Controls */}
       {!loading && !error && totalPages >= 1 && (
         <nav className="d-flex justify-content-center mt-4">
           <ul className="pagination">

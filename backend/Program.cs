@@ -67,7 +67,7 @@ builder.Services.AddAuthentication(options =>
         ValidateLifetime = true,
         ClockSkew = TimeSpan.Zero,
         NameClaimType = "nameid",   // matches token's "nameid"
-        RoleClaimType = "role"      // matches token's "role"
+        RoleClaimType = "role"  // matches token's "role"
     };
 });
 

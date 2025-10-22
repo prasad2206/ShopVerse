@@ -3,6 +3,7 @@ import React from "react";
 import { useCart } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api"; // for making backend calls
+import { toast } from "react-toastify";
 
 const CartPage = () => {
   const { cartItems, updateQuantity, removeFromCart, clearCart, totalAmount } =
