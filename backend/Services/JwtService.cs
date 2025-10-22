@@ -31,7 +31,8 @@ namespace ShopVerse.Services
                 {
                     new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                     new Claim(ClaimTypes.Name, user.Name),
-                    new Claim(ClaimTypes.Role, user.Role.Name)
+                    new Claim(ClaimTypes.Role, user.Role.Name),
+                    new Claim("id", user.Id.ToString()) // Add this claim
                 }),
                 Expires = DateTime.UtcNow.AddMinutes(Convert.ToDouble(_config["JwtSettings:ExpiryMinutes"])),
                 Issuer = _config["JwtSettings:Issuer"],

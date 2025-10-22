@@ -59,7 +59,10 @@ const Navbar = () => {
                   isActive ? "nav-link active" : "nav-link"
                 }
               >
-                Cart ({cartItems.length})
+                Cart{" "}
+                {token && cartItems.length > 0 && (
+                  <span className="cart-count">({cartItems.length})</span>
+                )}
               </NavLink>
             </li>
 

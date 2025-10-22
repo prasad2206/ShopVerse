@@ -3,13 +3,14 @@ import React from "react";
 import { useCart } from "../context/CartContext";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api"; // for making backend calls
+import { toast } from "react-toastify";
 
 const CartPage = () => {
   const { cartItems, updateQuantity, removeFromCart, clearCart, totalAmount } =
     useCart();
   const navigate = useNavigate();
 
-  // ✅ If cart empty → show message
+  // If cart empty → show message
   if (cartItems.length === 0) {
     return (
       <div className="container py-5 text-center">
@@ -106,7 +107,7 @@ const CartPage = () => {
 
                 <td>₹{item.price}</td>
 
-                {/* ✅ Quantity control */}
+                {/* Quantity control */}
                 <td>
                   <div
                     className="input-group input-group-sm"
@@ -135,7 +136,7 @@ const CartPage = () => {
 
                 <td>₹{(item.price * item.qty).toFixed(2)}</td>
 
-                {/* ✅ Remove button */}
+                {/* Remove button */}
                 <td>
                   <button
                     className="btn btn-outline-danger btn-sm"
@@ -150,7 +151,7 @@ const CartPage = () => {
         </table>
       </div>
 
-      {/* ✅ Cart summary + checkout */}
+      {/* Cart summary + checkout */}
       <div className="d-flex justify-content-end align-items-center mt-4">
         <div className="text-end">
           <h5>Total Amount: ₹{totalAmount.toFixed(2)}</h5>

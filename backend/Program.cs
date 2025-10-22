@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using ShopVerse.Data;
 using ShopVerse.Services;
+using System.Security.Claims;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,9 +26,15 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:5173") // vite default port
-              .AllowAnyHeader()
+        policy.WithOrigins(
+    "http://localhost:5174",
+    "http://localhost:5175",
+    "http://localhost:3000"
+) // vite default port
               .AllowAnyMethod()
+              .AllowAnyHeader()
+              .WithExposedHeaders("Authorization") 
+              .SetIsOriginAllowedToAllowWildcardSubdomains()
               .AllowCredentials();
     });
 });
@@ -58,7 +65,9 @@ builder.Services.AddAuthentication(options =>
         ValidateAudience = true,
         ValidAudience = builder.Configuration["JwtSettings:Audience"],
         ValidateLifetime = true,
-        ClockSkew = TimeSpan.Zero
+        ClockSkew = TimeSpan.Zero,
+        NameClaimType = "nameid",   // matches token's "nameid"
+        RoleClaimType = "role"  // matches token's "role"
     };
 });
 
@@ -78,13 +87,16 @@ var app = builder.Build();
 // Configure middleware
 if (app.Environment.IsDevelopment())
 {
+    app.UseDeveloperExceptionPage(); // Add this for detailed error pages
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseCors("AllowFrontend");
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

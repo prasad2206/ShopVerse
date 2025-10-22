@@ -27,7 +27,7 @@ const Login = () => {
       if (user?.role === "Admin") {
         navigate("/admin");
       } else {
-        navigate(redirect ? `/${redirect}` : "/");
+        navigate(redirect ? `/${redirect}` : "/products");
       }
     } else {
       toast.error(res.message || "Login failed");
