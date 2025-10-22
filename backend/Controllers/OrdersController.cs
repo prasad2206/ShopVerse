@@ -18,7 +18,7 @@ namespace ShopVerse.Controllers
             _context = context;
         }
 
-        // ✅ POST: api/orders → Place new order
+        // POST: api/orders → Place new order
         [Authorize] // only logged-in users can place order
         [HttpPost]
         public async Task<IActionResult> PlaceOrder([FromBody] OrderRequestDto dto)
@@ -26,10 +26,16 @@ namespace ShopVerse.Controllers
             if (dto == null || dto.Items == null || !dto.Items.Any())
                 return BadRequest(new { message = "Order items cannot be empty." });
 
-            // ✅ Get current user ID from token
-            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            // Get current user ID from token
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+               ?? User.FindFirst("id")?.Value; // Adjust claim type as needed
+            if (string.IsNullOrEmpty(userIdClaim))
+                return Unauthorized("User ID not found in token");
 
-            // ✅ Create new Order
+            var userId = int.Parse(userIdClaim);
+
+
+            // Create new Order
             var order = new Order
             {
                 UserId = userId,
@@ -41,7 +47,7 @@ namespace ShopVerse.Controllers
             _context.Orders.Add(order);
             await _context.SaveChangesAsync();
 
-            // ✅ Create order items
+            // Create order items
             foreach (var item in dto.Items)
             {
                 var orderItem = new OrderItem
@@ -59,7 +65,7 @@ namespace ShopVerse.Controllers
             return Ok(new { orderId = order.Id, message = "Order placed successfully!" });
         }
 
-        // ✅ GET: api/orders/{id} → Get specific order summary
+        // GET: api/orders/{id} → Get specific order summary
         [Authorize]
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetOrderById(int id)
@@ -92,7 +98,7 @@ namespace ShopVerse.Controllers
             return Ok(response);
         }
 
-        // ✅ GET: api/orders (for admin) → all orders list 
+        // GET: api/orders (for admin) → all orders list 
         [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> GetAllOrders()
@@ -117,9 +123,124 @@ namespace ShopVerse.Controllers
 
             return Ok(orders);
         }
+
+        //[Authorize]
+        //[HttpGet("my")]
+        //public async Task<IActionResult> GetMyOrders()
+        //{
+        //    try
+        //    {
+        //        // Extract user ID from JWT token claims
+        //        var userIdClaim = User.FindFirst("id")?.Value
+        //           ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+        //           ?? User.FindFirst("nameid")?.Value;
+
+        //        if (userIdClaim == null)
+        //            return Unauthorized("User ID not found in token");
+
+        //        var userId = int.Parse(userIdClaim);
+
+        //        var myOrders = await _context.Orders
+        //            .Include(o => o.OrderItems)
+        //            .ThenInclude(oi => oi.Product)
+        //            .Where(o => o.UserId == userId)
+        //            .ToListAsync();
+
+        //        return Ok(myOrders);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        // Log the exception details
+        //        return StatusCode(500, new { message = "An error occurred.", error = ex.Message });
+        //    }
+        //}
+
+        //[Authorize(Roles = "Customer")]
+        //[HttpGet("my")]
+        //public async Task<IActionResult> GetMyOrders()
+        //{
+        //    try
+        //    {
+        //        var userIdClaim = User.FindFirst("id")?.Value
+        //           ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+        //           ?? User.FindFirst("nameid")?.Value;
+
+        //        if (userIdClaim == null)
+        //            return Unauthorized("User ID not found in token");
+
+        //        if (!int.TryParse(userIdClaim, out var userId))
+        //            return Unauthorized($"Invalid userIdClaim value: {userIdClaim}");
+
+        //        var myOrders = await _context.Orders
+        //            .Where(o => o.UserId == userId)
+        //            .Include(o => o.OrderItems)
+        //            .ThenInclude(oi => oi.Product)
+        //            .Select(o => new
+        //            {
+        //                o.Id,
+        //                o.OrderDate,
+        //                o.TotalAmount,
+        //                o.Status,
+        //                Items = o.OrderItems.Select(oi => new
+        //                {
+        //                    oi.ProductId,
+        //                    ProductName = oi.Product != null ? oi.Product.Name : "(Deleted Product)",
+        //                    oi.Quantity,
+        //                    oi.UnitPrice
+        //                }).ToList()
+        //            })
+        //            .OrderByDescending(o => o.Id)
+        //            .ToListAsync();
+
+        //        return Ok(myOrders);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine($"GetMyOrders Error: {ex}");
+        //        return StatusCode(500, new { message = "Server error", error = ex.Message });
+        //    }
+        //}
+
+        [Authorize(Roles = "Customer")]
+        [HttpGet("my")]
+        public async Task<IActionResult> GetMyOrders()
+        {
+            var userIdClaim = User.FindFirst("id")?.Value
+               ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+               ?? User.FindFirst("nameid")?.Value;
+
+            if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId))
+                return Unauthorized(new { message = "Invalid or missing user ID in token" });
+
+            var myOrders = await _context.Orders
+                .Where(o => o.UserId == userId)
+                .Include(o => o.OrderItems)
+                .ThenInclude(oi => oi.Product)
+                .Select(o => new
+                {
+                    o.Id,
+                    o.OrderDate,
+                    o.TotalAmount,
+                    o.Status,
+                    Items = o.OrderItems.Select(oi => new
+                    {
+                        oi.ProductId,
+                        ProductName = oi.Product != null ? oi.Product.Name : "(Deleted Product)",
+                        oi.Quantity,
+                        oi.UnitPrice
+                    })
+                })
+                .OrderByDescending(o => o.Id)
+                .ToListAsync();
+
+            return Ok(myOrders);
+        }
+
+
     }
 
-    // ✅ DTO classes (request model)
+
+    // DTO classes (request model)
     public class OrderRequestDto
     {
         public List<OrderItemDto> Items { get; set; } = new();
