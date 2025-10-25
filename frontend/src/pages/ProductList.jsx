@@ -44,7 +44,7 @@ const ProductList = () => {
       if (maxPrice) params.maxPrice = maxPrice;
 
       const res = await api.get("/products", { params });
-      console.log("API response:", res.data);
+      // console.log("API response:", res.data);
 
       setProducts(res.data.products);
       setTotalPages(res.data.totalPages || 1); // update pagination count if backend sends it
