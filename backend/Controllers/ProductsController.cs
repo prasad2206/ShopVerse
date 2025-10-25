@@ -237,7 +237,10 @@ namespace ShopVerse.Controllers
 
                 // Delete old image if exists
                 if (!string.IsNullOrEmpty(product.ImageUrl))
+                {
+                    Console.WriteLine($"🗑 Deleting old image: {product.ImageUrl}");
                     await _imageService.DeleteImageAsync(product.ImageUrl);
+                }
 
                 // Save new image
                 var relativePath = await _imageService.SaveImageAsync(image);

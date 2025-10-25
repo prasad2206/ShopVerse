@@ -18,12 +18,14 @@ namespace ShopVerse.Services
                 throw new ArgumentException("Invalid image file");
 
             // Folder path → wwwroot/images/
-            var uploadsFolder = Path.Combine(_env.WebRootPath, "Images");
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "Images");
             Directory.CreateDirectory(uploadsFolder);
 
             // Unique filename
             var fileName = $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
             var filePath = Path.Combine(uploadsFolder, fileName);
+
+            Console.WriteLine($"💾 Saving image at: {filePath}");
 
             using (var stream = new FileStream(filePath, FileMode.Create))
                 await file.CopyToAsync(stream);
@@ -36,9 +38,10 @@ namespace ShopVerse.Services
         {
             try
             {
-                // Normalize and map to full physical path
-                var trimmedUrl = imageUrl.Replace("/", "\\").TrimStart('\\');
-                var fullPath = Path.Combine(_env.WebRootPath, trimmedUrl);
+                // Ensure proper path — handle leading slashes ("/Images/abc.png")
+                var trimmedPath = imageUrl.TrimStart('/'); // "Images/abc.png"
+
+                var fullPath = Path.Combine(Directory.GetCurrentDirectory(), trimmedPath);
 
                 if (File.Exists(fullPath))
                 {
@@ -49,13 +52,15 @@ namespace ShopVerse.Services
                 {
                     Console.WriteLine($"⚠️ Old image not found for deletion: {fullPath}");
                 }
+
                 return Task.FromResult(true);
             }
-            catch
+            catch (Exception ex)
             {
                 Console.WriteLine($"❌ Error deleting image: {ex.Message}");
                 return Task.FromResult(false);
             }
         }
+
     }
 }
