@@ -11,6 +11,9 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 
+
+
+
 // Registers controllers, FluentValidation, and auto-validation.
 
 builder.Services.AddControllers();
@@ -27,7 +30,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend", policy =>
     {
         policy.WithOrigins(
-    "http://localhost:5174",
+    "http://localhost:5173",
     "http://localhost:5175",
     "http://localhost:3000"
 ) // vite default port
@@ -66,8 +69,8 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = builder.Configuration["JwtSettings:Audience"],
         ValidateLifetime = true,
         ClockSkew = TimeSpan.Zero,
-        NameClaimType = "nameid",   // matches token's "nameid"
-        RoleClaimType = "role"  // matches token's "role"
+        NameClaimType = ClaimTypes.NameIdentifier,   // matches token's "nameid"
+        RoleClaimType = ClaimTypes.Role  // matches token's "role"
     };
 });
 
@@ -93,6 +96,21 @@ if (app.Environment.IsDevelopment())
 }
 
 //app.UseHttpsRedirection();
+
+app.UseStaticFiles();
+
+// Serve static files from "Images" folder
+var imagesPath = Path.Combine(Directory.GetCurrentDirectory(), "Images");
+if (!Directory.Exists(imagesPath))
+{
+    Directory.CreateDirectory(imagesPath);
+}
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(imagesPath),
+    RequestPath = "/Images"
+});
+
 
 app.UseCors("AllowFrontend");
 

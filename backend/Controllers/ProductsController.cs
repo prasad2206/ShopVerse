@@ -152,23 +152,52 @@ namespace ShopVerse.Controllers
         // PUT: api/products/{id} → Update product (Admin only)
         [Authorize(Roles = "Admin")]
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> Update(int id, [FromBody] ProductDto dto)
+        [RequestSizeLimit(10_000_000)] // Allow up to 10 MB image
+        public async Task<IActionResult> Update(int id, [FromForm] ProductDto dto)
         {
+
+            var authHeader = Request.Headers["Authorization"].FirstOrDefault();
+            Console.WriteLine($"🔍 AUTH HEADER: {authHeader}");
+
+            var userRole = User.FindFirst("role")?.Value;
+            Console.WriteLine($"🔍 ROLE FROM TOKEN: {userRole}");
+
+            var userName = User.Identity?.Name;
+            Console.WriteLine($"🔍 USER NAME: {userName}");
+
             var product = await _context.Products.FindAsync(id);
             if (product == null)
                 return NotFound(new { message = "Product not found" });
 
-            // Update fields
+            // Update basic fields
             product.Name = dto.Name;
             product.Description = dto.Description;
             product.Price = dto.Price;
             product.StockQuantity = dto.StockQuantity;
             product.Category = dto.Category;
-            product.ImageUrl = dto.ImageUrl;
 
-            await _context.SaveChangesAsync();       // Commit update
-            return Ok(product);
+            // Handle image update
+            if (dto.ImageFile != null)
+            {
+                // delete old image if exists
+                if (!string.IsNullOrEmpty(product.ImageUrl))
+                    await _imageService.DeleteImageAsync(product.ImageUrl);
+
+                // save new image
+                var newPath = await _imageService.SaveImageAsync(dto.ImageFile);
+                product.ImageUrl = newPath;
+            }
+            else if (!string.IsNullOrEmpty(dto.ImageUrl))
+            {
+                // Keep or manually update existing URL
+                product.ImageUrl = dto.ImageUrl;
+            }
+            // else keep existing if nothing provided
+
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "Product updated successfully", product });
         }
+
 
         // DELETE: api/products/{id} → Delete product (Admin only)
         [Authorize(Roles = "Admin")]
@@ -188,6 +217,52 @@ namespace ShopVerse.Controllers
 
             return Ok(new { message = "Product deleted successfully" });
         }
+
+
+        // POST: api/products/{id}/upload-image → Upload or update product image (Admin only)
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost("{id}/upload-image")]
+        [RequestSizeLimit(10_000_000)] // max 10 MB
+        public async Task<IActionResult> UploadProductImage(int id, IFormFile image)
+        {
+            try
+            {
+                var product = await _context.Products.FindAsync(id);
+                if (product == null)
+                    return NotFound(new { message = "Product not found" });
+
+                if (image == null || image.Length == 0)
+                    return BadRequest(new { message = "No image uploaded" });
+
+                // Delete old image if exists
+                if (!string.IsNullOrEmpty(product.ImageUrl))
+                    await _imageService.DeleteImageAsync(product.ImageUrl);
+
+                // Save new image
+                var relativePath = await _imageService.SaveImageAsync(image);
+
+                // Save uploaded image and store URL for frontend
+                product.ImageUrl = relativePath;
+
+                _context.Products.Update(product);
+                await _context.SaveChangesAsync();
+
+                return Ok(new
+                {
+                    message = "Image uploaded successfully",
+                    imageUrl = product.ImageUrl
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[UploadProductImage] Error: {ex}");
+                return StatusCode(500, new { message = "Internal Server Error", error = ex.Message });
+            }
+        }
+
+
+
         // GET: api/products/public → Public product listing (no auth)
         [AllowAnonymous]
         [HttpGet("public")]

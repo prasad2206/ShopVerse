@@ -4,7 +4,8 @@ import { useCart } from "../context/CartContext";
 
 const ProductCard = ({ product }) => {
   const navigate = useNavigate();
-  const { addToCart, clearCart, cartItems, updateQuantity, removeFromCart } = useCart();
+  const { addToCart, clearCart, cartItems, updateQuantity, removeFromCart } =
+    useCart();
 
   const handleBuyNow = (product) => {
     clearCart();
@@ -13,14 +14,19 @@ const ProductCard = ({ product }) => {
   };
 
   const image =
-    product.imageURL ?? product.imageUrl ?? product.image ?? "https://via.placeholder.com/400x300?text=No+Image";
+    product.imageUrl && product.imageUrl.trim() !== ""
+      ? product.imageUrl.startsWith("http")
+        ? product.imageUrl
+        : `http://localhost:5133${product.imageUrl}`
+      : "http://localhost:5133/Images/product1.png";
+
   const name = product.name ?? product.title ?? "Unnamed Product";
   const price = product.price ?? product.amount ?? 0;
   const category = product.category ?? product.categoryName ?? "";
   const shortDesc =
     product.description && product.description.length > 120
       ? product.description.slice(0, 117) + "..."
-      : product.description ?? "";
+      : (product.description ?? "");
 
   const itemInCart = cartItems.find((i) => i.id === product.id);
 
@@ -31,14 +37,22 @@ const ProductCard = ({ product }) => {
       </div>
 
       <div className="card-body d-flex flex-column">
-        <h5 className="card-title" title={name}>{name}</h5>
+        <h5 className="card-title" title={name}>
+          {name}
+        </h5>
         {category && (
-          <p className="text-muted mb-1" style={{ fontSize: 13 }}>{category}</p>
+          <p className="text-muted mb-1" style={{ fontSize: 13 }}>
+            {category}
+          </p>
         )}
         {shortDesc ? (
-          <p className="card-text" style={{ fontSize: 13 }}>{shortDesc}</p>
+          <p className="card-text" style={{ fontSize: 13 }}>
+            {shortDesc}
+          </p>
         ) : (
-          <p className="card-text text-muted" style={{ fontSize: 13 }}>No description</p>
+          <p className="card-text text-muted" style={{ fontSize: 13 }}>
+            No description
+          </p>
         )}
 
         <div className="mt-auto pt-2">
@@ -56,7 +70,10 @@ const ProductCard = ({ product }) => {
               </button>
 
               {/* Quantity Controller */}
-              <div className="input-group input-group-sm" style={{ width: "120px" }}>
+              <div
+                className="input-group input-group-sm"
+                style={{ width: "120px" }}
+              >
                 <button
                   className="btn btn-outline-secondary"
                   onClick={() => {

@@ -161,7 +161,6 @@ const AdminDashboard = () => {
     setModalLoading(true);
 
     try {
-      // Validation (basic)
       if (!form.name || !form.price) {
         toast.error("Please provide product name and price.");
         setModalLoading(false);
@@ -169,16 +168,26 @@ const AdminDashboard = () => {
       }
 
       if (isEditMode) {
-        const payload = {
-          name: form.name,
-          description: form.description,
-          price: parseFloat(form.price),
-          stockQuantity: parseInt(form.stockQuantity || "0"),
-          category: form.category,
-          imageUrl: form.imageUrl,
-        };
+        const fd = new FormData();
+        fd.append("Name", form.name);
+        fd.append("Description", form.description || "");
+        fd.append("Price", form.price || 0);
+        fd.append("StockQuantity", form.stockQuantity || 0);
+        fd.append("Category", form.category || "");
+        fd.append("ImageUrl", form.imageUrl || "");
 
-        const resp = await api.put(`/products/${form.id}`, payload);
+        if (imageFileRef.current) {
+          fd.append("ImageFile", imageFileRef.current);
+        }
+
+        const token = localStorage.getItem("token");
+        const resp = await api.put(`/products/${form.id}`, fd, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
         toast.success("Product updated");
         setShowModal(false);
         fetchProducts(pageNumber);
@@ -192,8 +201,12 @@ const AdminDashboard = () => {
         if (form.imageUrl) fd.append("ImageUrl", form.imageUrl);
         if (imageFileRef.current) fd.append("ImageFile", imageFileRef.current);
 
+        const token = localStorage.getItem("token");
         const resp = await api.post("/products", fd, {
-          headers: { "Content-Type": "multipart/form-data" },
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
         });
 
         toast.success("Product created");

@@ -17,8 +17,8 @@ namespace ShopVerse.Services
             if (file == null || file.Length == 0)
                 throw new ArgumentException("Invalid image file");
 
-            // Folder path → wwwroot/images/products
-            var uploadsFolder = Path.Combine(_env.WebRootPath, "images", "products");
+            // Folder path → wwwroot/images/
+            var uploadsFolder = Path.Combine(_env.WebRootPath, "Images");
             Directory.CreateDirectory(uploadsFolder);
 
             // Unique filename
@@ -29,20 +29,31 @@ namespace ShopVerse.Services
                 await file.CopyToAsync(stream);
 
             // Return relative URL
-            return $"images/products/{fileName}";
+            return $"/Images/{fileName}";
         }
 
         public Task<bool> DeleteImageAsync(string imageUrl)
         {
             try
             {
-                var fullPath = Path.Combine(_env.WebRootPath, imageUrl);
+                // Normalize and map to full physical path
+                var trimmedUrl = imageUrl.Replace("/", "\\").TrimStart('\\');
+                var fullPath = Path.Combine(_env.WebRootPath, trimmedUrl);
+
                 if (File.Exists(fullPath))
+                {
                     File.Delete(fullPath);
+                    Console.WriteLine($"🗑 Deleted old image: {fullPath}");
+                }
+                else
+                {
+                    Console.WriteLine($"⚠️ Old image not found for deletion: {fullPath}");
+                }
                 return Task.FromResult(true);
             }
             catch
             {
+                Console.WriteLine($"❌ Error deleting image: {ex.Message}");
                 return Task.FromResult(false);
             }
         }
