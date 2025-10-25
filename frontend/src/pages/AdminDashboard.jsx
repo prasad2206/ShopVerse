@@ -241,7 +241,13 @@ const AdminDashboard = () => {
 
   // Render product row
   const ProductRow = ({ p }) => {
-    const image = p.imageUrl || p.imageURL || "https://via.placeholder.com/150";
+    const image =
+      p.imageUrl && p.imageUrl.trim() !== ""
+        ? p.imageUrl.startsWith("http")
+          ? p.imageUrl
+          : `http://localhost:5133${p.imageUrl}`
+        : "http://localhost:5133/Images/product1.png";
+
     return (
       <tr>
         <td style={{ width: 120 }}>
